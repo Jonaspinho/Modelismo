@@ -1,0 +1,9 @@
+id,titulo,categoria,ano,data_postagem,capa,pdf,download
+1,Aero Exemplo nº 1,Aeromodelismo,2023,2026-11-18,capas/1.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+2,Aero Exemplo nº 2,Aeromodelismo,2024,2026-10-02,capas/2.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+3,Ferro Exemplo nº 3,Ferromodelismo,2022,2026-11-15,capas/3.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+4,Ferro Exemplo nº 4,Ferromodelismo,2024,2026-09-20,capas/4.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+5,Ferro Exemplo nº 5,Ferromodelismo,2025,2026-08-11,capas/5.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+6,Nauti Exemplo nº 6,Nautimodelismo,2021,2026-11-20,capas/6.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+7,Nauti Exemplo nº 7,Nautimodelismo,2023,2026-07-30,capas/7.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf
+8,Auto Exemplo nº 8,Automodelismo,2025,2026-06-05,capas/8.svg,pdfs/exemplo.pdf,pdfs/exemplo.pdf

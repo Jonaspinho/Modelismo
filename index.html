@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revistas de modelismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="toggle" id="toggle" aria-expanded="false" aria-controls="side">Filtros</button>
+<aside class="side" id="side">
+  <div class="top">
+    <div class="logo"><img src="logo.png" alt="Logo" onload="this.nextElementSibling.remove()" onerror="this.remove()"><span>Logo</span></div>
+    <h1>Revistas de modelismo</h1>
+  </div>
+  <input class="search" id="q" type="search" placeholder="Buscar pelo título" aria-label="Buscar pelo título">
+  <div><h2>Categorias</h2><div class="list" id="cats"></div></div>
+  <div><h2>Ano de publicação</h2><div class="years" id="anos"></div></div>
+</aside>
+<main>
+  <div class="head"><h2 id="h">Mais recentes</h2><span id="cnt"></span></div>
+  <div class="grid" id="grid"></div>
+  <p class="msg" id="msg" hidden></p>
+  <div id="fim"></div>
+</main>
+<script src="csv.js"></script>
+<script>
+const CORES={aeromodelismo:"#2C7BBF",ferromodelismo:"#A8561C",nautimodelismo:"#14457F",automodelismo:"#B3262B"};
+const cor=c=>CORES[c.toLowerCase()]||"#5C6B63";
+const $=s=>document.querySelector(s);
+const LOTE=12;
+let todos=[],lista=[],mostrados=0,cat="todas",ano="todos",busca="";
+
+function opt(txt,pressed,onclick,dot,n){
+  const b=document.createElement("button");b.className="opt";b.setAttribute("aria-pressed",pressed);
+  if(dot){const d=document.createElement("span");d.className="dot";d.style.background=dot;b.append(d)}
+  b.append(txt);
+  if(n!=null){const s=document.createElement("span");s.className="n";s.textContent=n;b.append(s)}
+  b.onclick=onclick;return b;
+}
+function menu(){
+  const cats=[...new Set(todos.map(r=>r.categoria))];
+  const c=$("#cats");c.replaceChildren(opt("Todas",cat==="todas",()=>{cat="todas";aplicar()},"#fff",todos.length));
+  cats.forEach(k=>c.append(opt(k,cat===k,()=>{cat=k;aplicar()},cor(k),todos.filter(r=>r.categoria===k).length)));
+  const anos=[...new Set(todos.map(r=>r.ano))].sort((a,b)=>b-a);
+  const a=$("#anos");a.replaceChildren(opt("Todos",ano==="todos",()=>{ano="todos";aplicar()}));
+  anos.forEach(y=>a.append(opt(y,ano===y,()=>{ano=y;aplicar()})));
+}
+function card(r){
+  const a=document.createElement("a");a.className="card";a.href="leitor.html?id="+encodeURIComponent(r.id);a.target="_blank";a.rel="noopener";
+  const cv=document.createElement("div");cv.className="cover";
+  const dias=(Date.now()-new Date(r.data_postagem+"T12:00:00"))/864e5;
+  if(dias>=0&&dias<=30){const n=document.createElement("span");n.className="new";n.textContent="Novo";cv.append(n)}
+  cv.append(criarIframeCapa(r.capa,r.titulo));
+  const bd=document.createElement("div");bd.className="band";bd.style.background=cor(r.categoria);bd.textContent=r.categoria;
+  const inf=document.createElement("div");inf.className="info";
+  const t=document.createElement("div");t.className="title";t.textContent=r.titulo;
+  const y=document.createElement("span");y.className="year";y.textContent=r.ano;
+  inf.append(t,y);a.append(cv,bd,inf);return a;
+}
+function mais(){
+  const fatia=lista.slice(mostrados,mostrados+LOTE);
+  fatia.forEach(r=>$("#grid").append(card(r)));
+  mostrados+=fatia.length;
+}
+function aplicar(){
+  const q=busca.toLowerCase();
+  lista=todos.filter(r=>(cat==="todas"||r.categoria===cat)&&(ano==="todos"||r.ano===ano)&&(!q||r.titulo.toLowerCase().includes(q)))
+    .sort((a,b)=>b.data_postagem.localeCompare(a.data_postagem));
+  $("#grid").replaceChildren();mostrados=0;menu();
+  $("#h").textContent=cat==="todas"?"Mais recentes":cat;
+  $("#cnt").textContent=lista.length+(lista.length===1?" revista":" revistas");
+  const m=$("#msg");m.hidden=lista.length>0;if(!lista.length)m.textContent="Nenhuma revista encontrada com esses filtros.";
+  mais();
+}
+$("#q").addEventListener("input",e=>{busca=e.target.value.trim();aplicar()});
+$("#toggle").onclick=()=>{const o=$("#side").classList.toggle("open");$("#toggle").setAttribute("aria-expanded",o)};
+new IntersectionObserver(es=>{if(es[0].isIntersecting&&mostrados<lista.length)mais()},{rootMargin:"400px"}).observe($("#fim"));
+
+carregarCatalogo().then(d=>{todos=d;aplicar()}).catch(()=>{
+  const m=$("#msg");m.hidden=false;
+  m.textContent="Não foi possível carregar o catalogo.csv. Abra a página pelo GitHub Pages ou por um servidor local (python -m http.server); abrir o arquivo direto não funciona.";
+});
+</script>
+</body>
+</html>
