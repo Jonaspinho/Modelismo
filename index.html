@@ -2,87 +2,105 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Revistas de modelismo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Acervo de Revistas de Modelismo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-<button class="toggle" id="toggle" aria-expanded="false" aria-controls="side">Filtros</button>
-<aside class="side" id="side">
-  <div class="top">
-    <div class="logo"><img src="logo.png" alt="Logo" onload="this.nextElementSibling.remove()" onerror="this.remove()"><span>Logo</span></div>
-    <h1>Revistas de modelismo</h1>
-  </div>
-  <input class="search" id="q" type="search" placeholder="Buscar pelo título" aria-label="Buscar pelo título">
-  <div><h2>Categorias</h2><div class="list" id="cats"></div></div>
-  <div><h2>Ano de publicação</h2><div class="years" id="anos"></div></div>
-</aside>
-<main>
-  <div class="head"><h2 id="h">Mais recentes</h2><span id="cnt"></span></div>
-  <div class="grid" id="grid"></div>
-  <p class="msg" id="msg" hidden></p>
-  <div id="fim"></div>
-</main>
-<script src="csv.js"></script>
-<script>
-const CORES={aeromodelismo:"#2C7BBF",ferromodelismo:"#A8561C",nautimodelismo:"#14457F",automodelismo:"#B3262B"};
-const cor=c=>CORES[c.toLowerCase()]||"#5C6B63";
-const $=s=>document.querySelector(s);
-const LOTE=12;
-let todos=[],lista=[],mostrados=0,cat="todas",ano="todos",busca="";
+<header class="topo">
+  <!-- Troque por seu logo quadrado: coloque logo.png na mesma pasta -->
+  <div class="logo"><img src="logo.png" alt="Logo" onerror="this.replaceWith(Object.assign(document.createElement('span'),{innerHTML:'<svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M2 14l9-9 3 3-9 9zM14 8l8 3-3 3zM3 21h18&quot;/></svg>'}))"></div>
+  <h1>Acervo de Modelismo</h1>
+  <button class="btn-menu" id="abrirMenu" aria-expanded="false" aria-controls="menu">Filtros</button>
+  <div class="busca"><input id="busca" type="search" placeholder="Buscar por título ou edição" aria-label="Buscar"></div>
+</header>
 
-function opt(txt,pressed,onclick,dot,n){
-  const b=document.createElement("button");b.className="opt";b.setAttribute("aria-pressed",pressed);
-  if(dot){const d=document.createElement("span");d.className="dot";d.style.background=dot;b.append(d)}
-  b.append(txt);
-  if(n!=null){const s=document.createElement("span");s.className="n";s.textContent=n;b.append(s)}
-  b.onclick=onclick;return b;
+<aside class="menu" id="menu" aria-label="Filtros do catálogo">
+  <details open><summary>Categorias</summary><div class="opcoes" id="f-categoria"></div></details>
+  <details open><summary>Ano de publicação</summary><div class="opcoes" id="f-ano"></div></details>
+  <details><summary>Título</summary><div class="opcoes" id="f-titulo"></div></details>
+  <button class="limpar" id="limpar">Limpar filtros</button>
+</aside>
+<div class="fundo" id="fundo"></div>
+
+<main>
+  <p class="resumo" id="resumo" aria-live="polite"></p>
+  <div class="grade" id="grade"></div>
+  <p class="vazio" id="vazio" hidden>Nenhuma revista encontrada. Limpe os filtros ou mude a busca.</p>
+  <p class="erro" id="erro" hidden></p>
+  <div id="sentinela"></div>
+</main>
+
+<script src="app.js"></script>
+<script>
+const LOTE=12;
+let todas=[],visiveis=[],mostradas=0;
+const filtros={categoria:"",ano:"",titulo:"",q:""};
+const $=s=>document.querySelector(s);
+
+function contar(lista,campo){
+  const m=new Map();
+  lista.forEach(r=>{if(r[campo])m.set(r[campo],(m.get(r[campo])||0)+1)});
+  return [...m.entries()];
 }
-function menu(){
-  const cats=[...new Set(todos.map(r=>r.categoria))];
-  const c=$("#cats");c.replaceChildren(opt("Todas",cat==="todas",()=>{cat="todas";aplicar()},"#fff",todos.length));
-  cats.forEach(k=>c.append(opt(k,cat===k,()=>{cat=k;aplicar()},cor(k),todos.filter(r=>r.categoria===k).length)));
-  const anos=[...new Set(todos.map(r=>r.ano))].sort((a,b)=>b-a);
-  const a=$("#anos");a.replaceChildren(opt("Todos",ano==="todos",()=>{ano="todos";aplicar()}));
-  anos.forEach(y=>a.append(opt(y,ano===y,()=>{ano=y;aplicar()})));
+function montarFiltro(id,campo,ordem){
+  const caixa=$("#"+id);
+  const itens=contar(todas,campo).sort(ordem);
+  caixa.innerHTML=[["",todas.length,"Todas"],...itens.map(([v,n])=>[v,n,v])].map(([v,n,rot])=>
+    `<button class="opcao" data-campo="${campo}" data-valor="${esc(v)}" aria-pressed="${filtros[campo]===v}">${esc(rot)}<span>${n}</span></button>`).join("");
 }
-function card(r){
-  const a=document.createElement("a");a.className="card";a.href="leitor.html?id="+encodeURIComponent(r.id);a.target="_blank";a.rel="noopener";
-  const cv=document.createElement("div");cv.className="cover";
-  const dias=(Date.now()-new Date(r.data_postagem+"T12:00:00"))/864e5;
-  if(dias>=0&&dias<=30){const n=document.createElement("span");n.className="new";n.textContent="Novo";cv.append(n)}
-  cv.append(criarIframeCapa(r.capa,r.titulo));
-  const bd=document.createElement("div");bd.className="band";bd.style.background=cor(r.categoria);bd.textContent=r.categoria;
-  const inf=document.createElement("div");inf.className="info";
-  const t=document.createElement("div");t.className="title";t.textContent=r.titulo;
-  const y=document.createElement("span");y.className="year";y.textContent=r.ano;
-  inf.append(t,y);a.append(cv,bd,inf);return a;
-}
-function mais(){
-  const fatia=lista.slice(mostrados,mostrados+LOTE);
-  fatia.forEach(r=>$("#grid").append(card(r)));
-  mostrados+=fatia.length;
+function montarMenu(){
+  montarFiltro("f-categoria","categoria",(a,b)=>a[0].localeCompare(b[0],"pt-BR"));
+  montarFiltro("f-ano","ano",(a,b)=>b[0].localeCompare(a[0]));
+  montarFiltro("f-titulo","titulo",(a,b)=>a[0].localeCompare(b[0],"pt-BR"));
 }
 function aplicar(){
-  const q=busca.toLowerCase();
-  lista=todos.filter(r=>(cat==="todas"||r.categoria===cat)&&(ano==="todos"||r.ano===ano)&&(!q||r.titulo.toLowerCase().includes(q)))
-    .sort((a,b)=>b.data_postagem.localeCompare(a.data_postagem));
-  $("#grid").replaceChildren();mostrados=0;menu();
-  $("#h").textContent=cat==="todas"?"Mais recentes":cat;
-  $("#cnt").textContent=lista.length+(lista.length===1?" revista":" revistas");
-  const m=$("#msg");m.hidden=lista.length>0;if(!lista.length)m.textContent="Nenhuma revista encontrada com esses filtros.";
-  mais();
+  const q=filtros.q.toLowerCase();
+  visiveis=todas.filter(r=>
+    (!filtros.categoria||r.categoria===filtros.categoria)&&
+    (!filtros.ano||r.ano===filtros.ano)&&
+    (!filtros.titulo||r.titulo===filtros.titulo)&&
+    (!q||(r.titulo+" "+r.edicao).toLowerCase().includes(q)))
+    .sort((a,b)=>(b.data_postagem||"").localeCompare(a.data_postagem||""));
+  mostradas=0;
+  $("#grade").innerHTML="";
+  $("#vazio").hidden=visiveis.length>0;
+  $("#resumo").textContent=visiveis.length+(visiveis.length===1?" revista":" revistas")+" · mais recentes primeiro";
+  montarMenu();
+  maisCards();
 }
-$("#q").addEventListener("input",e=>{busca=e.target.value.trim();aplicar()});
-$("#toggle").onclick=()=>{const o=$("#side").classList.toggle("open");$("#toggle").setAttribute("aria-expanded",o)};
-new IntersectionObserver(es=>{if(es[0].isIntersecting&&mostrados<lista.length)mais()},{rootMargin:"400px"}).observe($("#fim"));
+function card(r){
+  const capa=urlValida(r.capa_url)
+    ?`<iframe src="${esc(r.capa_url)}" title="Capa de ${esc(r.titulo)} ${esc(r.edicao)}" loading="lazy" tabindex="-1" sandbox=""></iframe>`
+    :`<div class="sem-capa">${esc(r.titulo)}<br>${esc(r.edicao)}</div>`;
+  return `<a class="card" href="leitor.html?id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">
+    <div class="capa">${capa}</div>
+    <div class="carimbo"><h2>${esc(r.titulo)}</h2><p>${esc(r.categoria)} · ${esc(r.edicao)}</p><p>${esc(r.ano)}</p></div></a>`;
+}
+function maisCards(){
+  if(mostradas>=visiveis.length)return;
+  const lote=visiveis.slice(mostradas,mostradas+LOTE);
+  $("#grade").insertAdjacentHTML("beforeend",lote.map(card).join(""));
+  mostradas+=lote.length;
+}
+const obs=new IntersectionObserver(es=>{if(es[0].isIntersecting)maisCards()},{rootMargin:"400px"});
+obs.observe($("#sentinela"));
 
-carregarCatalogo().then(d=>{todos=d;aplicar()}).catch(()=>{
-  const m=$("#msg");m.hidden=false;
-  m.textContent="Não foi possível carregar o catalogo.csv. Abra a página pelo GitHub Pages ou por um servidor local (python -m http.server); abrir o arquivo direto não funciona.";
+document.addEventListener("click",e=>{
+  const o=e.target.closest(".opcao");
+  if(o){filtros[o.dataset.campo]=o.dataset.valor;aplicar();document.body.classList.remove("menu-aberto");return}
+});
+$("#limpar").onclick=()=>{Object.assign(filtros,{categoria:"",ano:"",titulo:"",q:""});$("#busca").value="";aplicar()};
+$("#busca").addEventListener("input",e=>{filtros.q=e.target.value.trim();aplicar()});
+const alternar=()=>{const a=document.body.classList.toggle("menu-aberto");$("#abrirMenu").setAttribute("aria-expanded",a)};
+$("#abrirMenu").onclick=alternar;$("#fundo").onclick=alternar;
+
+carregarCatalogo().then(d=>{todas=d;aplicar()}).catch(err=>{
+  const e=$("#erro");e.hidden=false;
+  e.textContent=err.message+". Se abriu o arquivo direto do computador, publique no GitHub Pages ou rode um servidor local, pois o navegador bloqueia a leitura do CSV em file://.";
 });
 </script>
 </body>
