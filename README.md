@@ -39,9 +39,22 @@ python3 -m http.server 8000
 
 e acesse `http://localhost:8000`.
 
+## De onde a página lê o CSV
+
+No início do script do `index.html` existe a constante `CSV_URL`. Por padrão ela aponta para `revistas.csv` (mesmo repositório, no GitHub Pages). Para ler o CSV direto do GitHub, de qualquer página, troque por:
+
+```
+const CSV_URL="https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/main/revistas.csv";
+```
+
+- O repositório precisa ser público.
+- Links do tipo `github.com/.../blob/...` também funcionam: a página converte para o endereço raw.
+- Para testar outro CSV sem mexer no código: `https://SEU-SITE/?csv=ENDERECO-DO-CSV`.
+- Depois de editar o CSV no GitHub (botão de lápis, ou novo commit), basta recarregar a página. O endereço raw pode demorar alguns minutos para refletir a mudança por causa do cache do GitHub.
+- Links relativos de `pdf_url` e `capa_url` (como `pdfs/arquivo.pdf`) são resolvidos a partir do endereço da página, então funcionam quando os PDFs estão no mesmo site do GitHub Pages. Se a página estiver em outro lugar, use links completos.
+
 ## Observações
 
-- O `index.html` carrega `revistas.csv` com `fetch`. Se o navegador não conseguir ler o arquivo (por exemplo, ao abrir o `index.html` com duplo clique), a página usa uma cópia de reserva embutida no próprio HTML e avisa no menu lateral. Ao editar o CSV, atualize também essa cópia (bloco `csv-reserva`) se quiser que ela fique igual.
 - PDFs hospedados no próprio repositório abrem no leitor sem problemas. Links de outros sites só abrem se o site permitir exibição em iframe; o botão **Abrir em nova aba** serve de alternativa.
 - GitHub limita arquivos comuns a 100 MB.
 - O botão **Carregar outro CSV** testa um arquivo local sem alterá-lo no repositório.

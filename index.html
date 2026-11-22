@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>O Porão</title>
+<title>Catálogo de revistas de modelismo</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -110,7 +110,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
       </fieldset>
       <button id="clear">Limpar filtros</button>
       <div class="csvbox">
-        Os dados vêm do arquivo revistas.csv (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url).
+        Os dados são lidos de um CSV hospedado no GitHub (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url).
         <label class="btn" for="csvfile">Carregar outro CSV</label>
         <input type="file" id="csvfile" accept=".csv,text/csv">
         <p id="msg" role="status"></p>
@@ -137,27 +137,6 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
   <iframe class="rframe" id="rFrame" title="Leitor de PDF"></iframe>
   <p class="rnote" id="rNote">Se o PDF não aparecer aqui, use “Abrir em nova aba”: alguns sites não permitem exibição dentro de outra página.</p>
 </div>
-
-<!-- Cópia de reserva do revistas.csv: só é usada quando o navegador não consegue ler o arquivo (ex.: index.html aberto com duplo clique). -->
-<script type="text/csv" id="csv-reserva">titulo,ano,pais,sigla,categorias,data_publicacao,capa_url,pdf_url
-Model Railroader,1934,EUA,US,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Railway Modeller,1949,Reino Unido,UK,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-MIBA,1948,Alemanha,DE,Ferromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Engineer,1898,Reino Unido,UK,Vapor vivo;Ferromodelismo,2026-10-15,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Aeromodeller,1935,Reino Unido,UK,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Airplane News,1929,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Aviation,1975,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Boats,1950,Reino Unido,UK,Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Ships in Scale,1982,EUA,US,Nautimodelismo;Plastimodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-FineScale Modeler,1982,EUA,US,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Scale Aircraft Modelling,1978,Reino Unido,UK,Plastimodelismo;Aeromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Military Modelling,1971,Reino Unido,UK,Militar;Plastimodelismo,2026-08-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Art,1966,Japão,JP,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Hobby Japan,1969,Japão,JP,Plastimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Scale Auto,1978,EUA,US,Automodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-RC Car Action,1990,EUA,US,Automodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Modell Fan,1970,Alemanha,DE,Aeromodelismo;Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-</script>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -309,20 +288,27 @@ $("csvfile").addEventListener("change",e=>{
   e.target.value="";
 });
 
-function iniciar(texto,aviso){
-  films=toFilms(texto);buildFilters();render();
-  if(aviso)$("msg").textContent=aviso;
+/* Endereço do CSV. Troque pelo link do seu arquivo no GitHub, por exemplo:
+   https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/main/revistas.csv
+   Também é aceito o link normal (github.com/.../blob/...), que é convertido para raw.
+   Para testar outro CSV sem editar o código, use ?csv=ENDERECO na URL da página. */
+const CSV_URL="revistas.csv";
+
+function resolveCsvUrl(){
+  let u=new URLSearchParams(location.search).get("csv")||CSV_URL;
+  const m=u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);
+  if(m)u=`https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`;
+  return u;
 }
-fetch("revistas.csv",{cache:"no-cache"})
-  .then(r=>{if(!r.ok)throw new Error("revistas.csv não encontrado");return r.text()})
-  .then(t=>iniciar(t,""))
-  .catch(()=>{
-    try{
-      iniciar($("csv-reserva").textContent,"Não foi possível ler revistas.csv; exibindo a cópia de reserva embutida. Publique no GitHub Pages ou use um servidor local para ler o arquivo.");
-    }catch(err){
-      buildFilters();render();
-      $("grid").innerHTML='<div class="empty"><strong>Catálogo indisponível.</strong><p>'+esc(err.message)+'</p></div>';
-    }
+const csvUrl=resolveCsvUrl();
+fetch(csvUrl,{cache:"no-cache"})
+  .then(r=>{if(!r.ok)throw new Error("resposta "+r.status+" ao buscar o CSV");return r.text()})
+  .then(t=>{films=toFilms(t);buildFilters();render();$("msg").textContent=`${films.length} revistas lidas de ${csvUrl}`})
+  .catch(err=>{
+    buildFilters();render();
+    const m="Não foi possível carregar o CSV ("+csvUrl+"): "+err.message+". Confira o endereço em CSV_URL e se o repositório é público.";
+    $("msg").textContent=m;
+    $("grid").innerHTML='<div class="empty"><strong>Catálogo indisponível.</strong><p>'+esc(m)+'</p></div>';
   });
 </script>
 </body>
