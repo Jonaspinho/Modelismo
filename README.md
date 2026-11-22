@@ -58,6 +58,7 @@ const CSV_URL="https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/mai
 
 ## Observações
 
+- O catálogo carrega conforme a rolagem: 12 revistas por vez, e mais 12 a cada vez que o fim da lista se aproxima. O tamanho do bloco está na constante `PAGE`, no `index.html`.
 - PDFs hospedados no próprio repositório abrem no leitor sem problemas. Links de outros sites só abrem se o site permitir exibição em iframe; o botão **Abrir em nova aba** serve de alternativa.
 - GitHub limita arquivos comuns a 100 MB.
 - O botão **Carregar outro CSV** testa um arquivo local sem alterá-lo no repositório.

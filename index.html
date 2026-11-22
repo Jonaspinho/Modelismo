@@ -58,6 +58,8 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 .info{padding:12px 14px 14px;font-size:.88rem}
 .info h3{font:700 1rem var(--head);margin:0}
 .info p{margin:2px 0 0;color:var(--muted)}
+#sentinel{height:1px}
+#more{text-align:center;color:var(--muted);font-size:.85rem;margin:20px 0 0}
 .empty{grid-column:1/-1;padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
 .reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader[hidden]{display:none}
@@ -124,6 +126,8 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
       <div class="chips" id="chips"></div>
     </div>
     <div class="grid" id="grid"></div>
+    <div id="sentinel" aria-hidden="true"></div>
+    <p id="more" role="status"></p>
   </main>
 </div>
 
@@ -227,7 +231,18 @@ function render(){
   if(state.decade)add(`Anos ${state.decade}`,()=>{state.decade="";$("decade").value="";render()});
   if(state.country)add(state.country,()=>{state.country="";$("country").value="";render()});
 
-  $("grid").innerHTML=list.length?list.map(f=>`
+  current=list;shown=0;$("grid").innerHTML="";
+  if(list.length)showMore();
+  else{
+    $("grid").innerHTML=`<div class="empty"><strong>Nenhuma revista encontrada.</strong><p>Remova um filtro para ver mais revistas.</p><button class="primary" onclick="reset()">Limpar filtros</button></div>`;
+    updateStatus();
+  }
+}
+
+/* ---------- Carregamento sob demanda (rolagem) ---------- */
+const PAGE=window.IntersectionObserver?12:1e6;
+let current=[],shown=0;
+const cardHtml=f=>`
     <button class="card" data-i="${f.i}" aria-label="Ler ${esc(f.title)}">
       <div class="poster${f.cover?" hascover":""}" style="--c1:${f.c1};--c2:${f.c2}">
         ${f.cover?`<iframe src="${esc(f.cover)}" title="" tabindex="-1" scrolling="no" loading="lazy"></iframe>`:""}
@@ -240,9 +255,22 @@ function render(){
         <p>${esc(f.country)} · desde ${f.year||"—"}</p>
         <p>Publicação: ${fmt(f.pub)}</p>
       </div>
-    </button>`).join(""):
-    `<div class="empty"><strong>Nenhuma revista encontrada.</strong><p>Remova um filtro para ver mais revistas.</p><button class="primary" onclick="reset()">Limpar filtros</button></div>`;
+    </button>`;
+function updateStatus(){
+  const m=$("more");
+  m.textContent=!current.length?"":shown<current.length?`Mostrando ${shown} de ${current.length}. Role para carregar mais.`:current.length>PAGE?`Todas as ${current.length} revistas foram carregadas.`:"";
 }
+function showMore(){
+  const next=current.slice(shown,shown+PAGE);
+  $("grid").insertAdjacentHTML("beforeend",next.map(cardHtml).join(""));
+  shown+=next.length;
+  updateStatus();
+  if(io&&shown<current.length){io.unobserve($("sentinel"));io.observe($("sentinel"))}
+}
+const io=window.IntersectionObserver?new IntersectionObserver(es=>{
+  if(es[0].isIntersecting&&shown<current.length)showMore();
+},{rootMargin:"400px"}):null;
+if(io)io.observe($("sentinel"));
 
 /* ---------- Leitor de PDF ---------- */
 let lastCard=null;
