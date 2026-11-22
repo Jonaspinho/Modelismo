@@ -3,105 +3,327 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Acervo de Revistas de Modelismo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css">
+<title>Catálogo de revistas de modelismo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#e9eef2; --panel:#f7f9fb; --ink:#14213d; --muted:#56637e; --line:#c9d3de; --accent:#2b4bff; --accent-ink:#fff;
+  --head:"Bricolage Grotesque","Trebuchet MS",sans-serif; --body:"Instrument Sans","Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f1624;--panel:#18223a;--ink:#e8edf7;--muted:#9aa8c4;--line:#2b3957;--accent:#7f95ff;--accent-ink:#0f1624;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f1624;--panel:#18223a;--ink:#e8edf7;--muted:#9aa8c4;--line:#2b3957;--accent:#7f95ff;--accent-ink:#0f1624;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{padding:28px clamp(16px,4vw,48px) 8px}
+h1{font:800 clamp(2rem,5vw,3.4rem)/1 var(--head);margin:0;letter-spacing:-.02em}
+header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
+.layout{display:grid;grid-template-columns:270px 1fr;gap:28px;padding:20px clamp(16px,4vw,48px) 48px;align-items:start}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;position:sticky;top:16px}
+aside h2{font:700 1.05rem var(--head);margin:0 0 12px}
+fieldset{border:0;padding:0;margin:0 0 18px}
+legend{font:600 .9rem var(--body);padding:0;margin-bottom:8px}
+label.chk{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:.95rem}
+label.chk input{accent-color:var(--accent);width:16px;height:16px}
+label.chk .n{margin-left:auto;color:var(--muted);font-size:.8rem}
+input[type=search],select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+button,.btn{font:600 .9rem var(--body);cursor:pointer;border-radius:8px;padding:9px 12px;border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;display:inline-block}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.csvbox{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;font-size:.85rem;color:var(--muted)}
+.csvbox input{display:none}
+.csvbox label{margin-top:6px}
+#msg{margin:8px 0 0;font-size:.85rem}
+.toggle{display:none;width:100%;margin-bottom:12px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--accent);color:var(--accent-ink);border:0;border-radius:99px;padding:4px 10px;font-size:.8rem}
+#count{font:700 1.1rem var(--head)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;padding:0;text-align:left;color:inherit;font:inherit;width:100%}
+.card:hover{border-color:var(--accent)}
+.poster{position:relative;overflow:hidden;aspect-ratio:2/3;padding:14px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(160deg,var(--c1),var(--c2))}
+.poster b{font:800 1.5rem/1.05 var(--head);letter-spacing:-.01em;overflow-wrap:anywhere}
+.poster span{font:500 .8rem var(--body);opacity:.9}
+.poster iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;background:#fff}
+.poster .score,.poster .t{position:relative;z-index:1}
+.poster.hascover .t{display:none}
+.score{align-self:flex-end;background:rgba(0,0,0,.55);border-radius:6px;padding:2px 8px;font:700 .95rem var(--head)}
+.info{padding:12px 14px 14px;font-size:.88rem}
+.info h3{font:700 1rem var(--head);margin:0}
+.info p{margin:2px 0 0;color:var(--muted)}
+.empty{grid-column:1/-1;padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
+.reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.reader[hidden]{display:none}
+.rbar{display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,28px);border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.rbar strong{font:800 1.2rem var(--head)}
+.rbar .meta{color:var(--muted);font-size:.85rem;flex:1;min-width:140px}
+.rframe{flex:1;border:0;width:100%;background:#fff}
+.rnote{margin:0;padding:8px clamp(12px,3vw,28px);font-size:.85rem;color:var(--muted);border-top:1px solid var(--line)}
+@media (max-width:760px){
+  .layout{grid-template-columns:1fr}
+  aside{position:static;display:none}
+  aside.open{display:block}
+  .toggle{display:block}
+}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
 </head>
 <body>
-<header class="topo">
-  <!-- Troque por seu logo quadrado: coloque logo.png na mesma pasta -->
-  <div class="logo"><img src="logo.png" alt="Logo" onerror="this.replaceWith(Object.assign(document.createElement('span'),{innerHTML:'<svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M2 14l9-9 3 3-9 9zM14 8l8 3-3 3zM3 21h18&quot;/></svg>'}))"></div>
-  <h1>Acervo de Modelismo</h1>
-  <button class="btn-menu" id="abrirMenu" aria-expanded="false" aria-controls="menu">Filtros</button>
-  <div class="busca"><input id="busca" type="search" placeholder="Buscar por título ou edição" aria-label="Buscar"></div>
+<header>
+  <h1>Revistas de modelismo</h1>
+  <p>Filtre por categoria, país e década. Clique em uma revista para ler o PDF.</p>
 </header>
 
-<aside class="menu" id="menu" aria-label="Filtros do catálogo">
-  <details open><summary>Categorias</summary><div class="opcoes" id="f-categoria"></div></details>
-  <details open><summary>Ano de publicação</summary><div class="opcoes" id="f-ano"></div></details>
-  <details><summary>Título</summary><div class="opcoes" id="f-titulo"></div></details>
-  <button class="limpar" id="limpar">Limpar filtros</button>
-</aside>
-<div class="fundo" id="fundo"></div>
+<div class="layout">
+  <div class="side-wrap">
+    <button class="toggle" id="toggle" aria-expanded="false" aria-controls="filters">Mostrar filtros</button>
+    <aside id="filters" aria-label="Filtros">
+      <h2>Filtros</h2>
+      <fieldset>
+        <legend>Buscar</legend>
+        <input type="search" id="q" placeholder="Título da revista" aria-label="Buscar por título">
+      </fieldset>
+      <fieldset id="genres"><legend>Categoria</legend></fieldset>
+      <fieldset>
+        <legend>País</legend>
+        <select id="country" aria-label="País"></select>
+      </fieldset>
+      <fieldset>
+        <legend>Década</legend>
+        <select id="decade" aria-label="Década"></select>
+      </fieldset>
+      <fieldset>
+        <legend>Ordenar por</legend>
+        <select id="sort" aria-label="Ordenar por">
+          <option value="pub">Publicação mais recente</option>
+          <option value="year-desc">Ano mais recente</option>
+          <option value="year-asc">Ano mais antigo</option>
+          <option value="title">Título (A–Z)</option>
+        </select>
+      </fieldset>
+      <button id="clear">Limpar filtros</button>
+      <div class="csvbox">
+        Os dados vêm do arquivo revistas.csv (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url).
+        <label class="btn" for="csvfile">Carregar outro CSV</label>
+        <input type="file" id="csvfile" accept=".csv,text/csv">
+        <p id="msg" role="status"></p>
+      </div>
+    </aside>
+  </div>
 
-<main>
-  <p class="resumo" id="resumo" aria-live="polite"></p>
-  <div class="grade" id="grade"></div>
-  <p class="vazio" id="vazio" hidden>Nenhuma revista encontrada. Limpe os filtros ou mude a busca.</p>
-  <p class="erro" id="erro" hidden></p>
-  <div id="sentinela"></div>
-</main>
+  <main>
+    <div class="bar">
+      <span id="count" aria-live="polite"></span>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
 
-<script src="app.js"></script>
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
+  <div class="rbar">
+    <strong id="rTitle"></strong>
+    <span class="meta" id="rMeta"></span>
+    <a class="btn" id="rOpen" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+    <button class="primary" id="rClose">Fechar</button>
+  </div>
+  <iframe class="rframe" id="rFrame" title="Leitor de PDF"></iframe>
+  <p class="rnote" id="rNote">Se o PDF não aparecer aqui, use “Abrir em nova aba”: alguns sites não permitem exibição dentro de outra página.</p>
+</div>
+
+<!-- Cópia de reserva do revistas.csv: só é usada quando o navegador não consegue ler o arquivo (ex.: index.html aberto com duplo clique). -->
+<script type="text/csv" id="csv-reserva">titulo,ano,pais,sigla,categorias,data_publicacao,capa_url,pdf_url
+Model Railroader,1934,EUA,US,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Railway Modeller,1949,Reino Unido,UK,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+MIBA,1948,Alemanha,DE,Ferromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Engineer,1898,Reino Unido,UK,Vapor vivo;Ferromodelismo,2026-10-15,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Aeromodeller,1935,Reino Unido,UK,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Airplane News,1929,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Aviation,1975,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Boats,1950,Reino Unido,UK,Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Ships in Scale,1982,EUA,US,Nautimodelismo;Plastimodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+FineScale Modeler,1982,EUA,US,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Scale Aircraft Modelling,1978,Reino Unido,UK,Plastimodelismo;Aeromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Military Modelling,1971,Reino Unido,UK,Militar;Plastimodelismo,2026-08-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Art,1966,Japão,JP,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Hobby Japan,1969,Japão,JP,Plastimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Scale Auto,1978,EUA,US,Automodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+RC Car Action,1990,EUA,US,Automodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Modell Fan,1970,Alemanha,DE,Aeromodelismo;Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+</script>
+
 <script>
-const LOTE=12;
-let todas=[],visiveis=[],mostradas=0;
-const filtros={categoria:"",ano:"",titulo:"",q:""};
-const $=s=>document.querySelector(s);
+const $=id=>document.getElementById(id);
+let films=[];
+const state={genres:new Set(),decade:"",country:"",q:"",sort:"pub"};
 
-function contar(lista,campo){
-  const m=new Map();
-  lista.forEach(r=>{if(r[campo])m.set(r[campo],(m.get(r[campo])||0)+1)});
-  return [...m.entries()];
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows=[];let row=[],cur="",inQ=false;
+  text=text.replace(/^\uFEFF/,"");
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++} else inQ=false }
+      else cur+=c;
+    }else if(c==='"') inQ=true;
+    else if(c===","){row.push(cur);cur=""}
+    else if(c==="\n"||c==="\r"){
+      if(c==="\r"&&text[i+1]==="\n")i++;
+      row.push(cur);cur="";
+      if(row.some(v=>v.trim()!==""))rows.push(row);
+      row=[];
+    }else cur+=c;
+  }
+  row.push(cur);
+  if(row.some(v=>v.trim()!==""))rows.push(row);
+  return rows;
 }
-function montarFiltro(id,campo,ordem){
-  const caixa=$("#"+id);
-  const itens=contar(todas,campo).sort(ordem);
-  caixa.innerHTML=[["",todas.length,"Todas"],...itens.map(([v,n])=>[v,n,v])].map(([v,n,rot])=>
-    `<button class="opcao" data-campo="${campo}" data-valor="${esc(v)}" aria-pressed="${filtros[campo]===v}">${esc(rot)}<span>${n}</span></button>`).join("");
+function hue(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h%360}
+function safeUrl(u){u=(u||"").trim();return /^(https?:\/\/|[^:\s]+$)/i.test(u)?u:""}
+function toFilms(text){
+  const rows=parseCSV(text);
+  if(rows.length<2)throw new Error("O CSV está vazio.");
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  if(!head.includes("titulo"))throw new Error("O CSV precisa ter a coluna “titulo”.");
+  return rows.slice(1).map(r=>{
+    const o={};head.forEach((h,i)=>o[h]=(r[i]||"").trim());
+    const h=hue(o.titulo);
+    return{
+      title:o.titulo,year:parseInt(o.ano,10)||0,country:o.pais||"—",
+      code:(o.sigla||o.pais||"").slice(0,3).toUpperCase(),
+      genres:(o.categorias||"").split(";").map(s=>s.trim()).filter(Boolean),
+      pub:o.data_publicacao||"",cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),
+      c1:`hsl(${h} 60% 42%)`,c2:`hsl(${h} 65% 14%)`
+    };
+  });
 }
-function montarMenu(){
-  montarFiltro("f-categoria","categoria",(a,b)=>a[0].localeCompare(b[0],"pt-BR"));
-  montarFiltro("f-ano","ano",(a,b)=>b[0].localeCompare(a[0]));
-  montarFiltro("f-titulo","titulo",(a,b)=>a[0].localeCompare(b[0],"pt-BR"));
-}
-function aplicar(){
-  const q=filtros.q.toLowerCase();
-  visiveis=todas.filter(r=>
-    (!filtros.categoria||r.categoria===filtros.categoria)&&
-    (!filtros.ano||r.ano===filtros.ano)&&
-    (!filtros.titulo||r.titulo===filtros.titulo)&&
-    (!q||(r.titulo+" "+r.edicao).toLowerCase().includes(q)))
-    .sort((a,b)=>(b.data_postagem||"").localeCompare(a.data_postagem||""));
-  mostradas=0;
-  $("#grade").innerHTML="";
-  $("#vazio").hidden=visiveis.length>0;
-  $("#resumo").textContent=visiveis.length+(visiveis.length===1?" revista":" revistas")+" · mais recentes primeiro";
-  montarMenu();
-  maisCards();
-}
-function card(r){
-  const capa=urlValida(r.capa_url)
-    ?`<iframe src="${esc(r.capa_url)}" title="Capa de ${esc(r.titulo)} ${esc(r.edicao)}" loading="lazy" tabindex="-1" sandbox=""></iframe>`
-    :`<div class="sem-capa">${esc(r.titulo)}<br>${esc(r.edicao)}</div>`;
-  return `<a class="card" href="leitor.html?id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">
-    <div class="capa">${capa}</div>
-    <div class="carimbo"><h2>${esc(r.titulo)}</h2><p>${esc(r.categoria)} · ${esc(r.edicao)}</p><p>${esc(r.ano)}</p></div></a>`;
-}
-function maisCards(){
-  if(mostradas>=visiveis.length)return;
-  const lote=visiveis.slice(mostradas,mostradas+LOTE);
-  $("#grade").insertAdjacentHTML("beforeend",lote.map(card).join(""));
-  mostradas+=lote.length;
-}
-const obs=new IntersectionObserver(es=>{if(es[0].isIntersecting)maisCards()},{rootMargin:"400px"});
-obs.observe($("#sentinela"));
 
-document.addEventListener("click",e=>{
-  const o=e.target.closest(".opcao");
-  if(o){filtros[o.dataset.campo]=o.dataset.valor;aplicar();document.body.classList.remove("menu-aberto");return}
+/* ---------- Interface ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("pt-BR"):"—";
+
+function buildFilters(){
+  const g=$("genres");g.innerHTML="<legend>Categoria</legend>";
+  const gens=[...new Set(films.flatMap(f=>f.genres))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  gens.forEach(name=>{
+    const n=films.filter(f=>f.genres.includes(name)).length;
+    const l=document.createElement("label");l.className="chk";
+    l.innerHTML=`<input type="checkbox" value="${esc(name)}"><span>${esc(name)}</span><span class="n">${n}</span>`;
+    l.querySelector("input").addEventListener("change",e=>{e.target.checked?state.genres.add(name):state.genres.delete(name);render()});
+    g.appendChild(l);
+  });
+  const opt=(sel,items,all)=>{sel.innerHTML=`<option value="">${all}</option>`+items.map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join("")};
+  opt($("country"),[...new Set(films.map(f=>f.country))].sort((a,b)=>a.localeCompare(b,"pt-BR")).map(c=>[c,c]),"Todos");
+  opt($("decade"),[...new Set(films.filter(f=>f.year).map(f=>Math.floor(f.year/10)*10))].sort((a,b)=>b-a).map(d=>[d,`Anos ${d}`]),"Todas");
+}
+function reset(){
+  state.genres.clear();state.decade="";state.country="";state.q="";state.sort="pub";
+  document.querySelectorAll("#genres input").forEach(i=>i.checked=false);
+  $("decade").value="";$("country").value="";$("q").value="";$("sort").value="pub";
+  render();
+}
+function render(){
+  let list=films.map((f,i)=>({...f,i})).filter(f=>
+    (!state.genres.size||[...state.genres].every(g=>f.genres.includes(g)))&&
+    (!state.decade||Math.floor(f.year/10)*10==state.decade)&&
+    (!state.country||f.country===state.country)&&
+    (!state.q||f.title.toLowerCase().includes(state.q))
+  );
+  const s=state.sort;
+  list.sort((a,b)=>s==="pub"?b.pub.localeCompare(a.pub):s==="year-desc"?b.year-a.year:s==="year-asc"?a.year-b.year:a.title.localeCompare(b.title,"pt-BR"));
+  $("count").textContent=list.length===1?"1 revista":`${list.length} revistas`;
+
+  const chips=$("chips");chips.innerHTML="";
+  const add=(label,fn)=>{const b=document.createElement("button");b.className="chip";b.textContent=label+" ×";b.setAttribute("aria-label","Remover filtro "+label);b.onclick=fn;chips.appendChild(b)};
+  state.genres.forEach(g=>add(g,()=>{state.genres.delete(g);document.querySelectorAll("#genres input").forEach(i=>{if(i.value===g)i.checked=false});render()}));
+  if(state.decade)add(`Anos ${state.decade}`,()=>{state.decade="";$("decade").value="";render()});
+  if(state.country)add(state.country,()=>{state.country="";$("country").value="";render()});
+
+  $("grid").innerHTML=list.length?list.map(f=>`
+    <button class="card" data-i="${f.i}" aria-label="Ler ${esc(f.title)}">
+      <div class="poster${f.cover?" hascover":""}" style="--c1:${f.c1};--c2:${f.c2}">
+        ${f.cover?`<iframe src="${esc(f.cover)}" title="" tabindex="-1" scrolling="no" loading="lazy"></iframe>`:""}
+        <span class="score">${esc(f.code)}</span>
+        <div class="t"><b>${esc(f.title)}</b><span>desde ${f.year||"—"}</span></div>
+      </div>
+      <div class="info">
+        <h3>${esc(f.title)}</h3>
+        <p>${esc(f.genres.join(", "))}</p>
+        <p>${esc(f.country)} · desde ${f.year||"—"}</p>
+        <p>Publicação: ${fmt(f.pub)}</p>
+      </div>
+    </button>`).join(""):
+    `<div class="empty"><strong>Nenhuma revista encontrada.</strong><p>Remova um filtro para ver mais revistas.</p><button class="primary" onclick="reset()">Limpar filtros</button></div>`;
+}
+
+/* ---------- Leitor de PDF ---------- */
+let lastCard=null;
+function openReader(f,card){
+  lastCard=card;
+  $("rTitle").textContent=f.title;
+  $("rMeta").textContent=`${f.country} · desde ${f.year||"—"} · publicação ${fmt(f.pub)}`;
+  const o=$("rOpen");
+  if(f.pdf){o.href=f.pdf;o.hidden=false;$("rFrame").hidden=false;$("rFrame").src=f.pdf;$("rNote").textContent="Se o PDF não aparecer aqui, use “Abrir em nova aba”: alguns sites não permitem exibição dentro de outra página."}
+  else{o.hidden=true;$("rFrame").hidden=true;$("rFrame").src="about:blank";$("rNote").textContent="Esta revista ainda não tem um link de PDF no CSV (coluna pdf_url)."}
+  $("reader").hidden=false;document.body.style.overflow="hidden";
+  $("rClose").focus();
+}
+function closeReader(){
+  $("reader").hidden=true;$("rFrame").src="about:blank";document.body.style.overflow="";
+  if(lastCard)lastCard.focus();
+}
+$("rClose").addEventListener("click",closeReader);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("reader").hidden)closeReader()});
+$("grid").addEventListener("click",e=>{
+  const c=e.target.closest(".card");if(c)openReader(films[+c.dataset.i],c);
 });
-$("#limpar").onclick=()=>{Object.assign(filtros,{categoria:"",ano:"",titulo:"",q:""});$("#busca").value="";aplicar()};
-$("#busca").addEventListener("input",e=>{filtros.q=e.target.value.trim();aplicar()});
-const alternar=()=>{const a=document.body.classList.toggle("menu-aberto");$("#abrirMenu").setAttribute("aria-expanded",a)};
-$("#abrirMenu").onclick=alternar;$("#fundo").onclick=alternar;
 
-carregarCatalogo().then(d=>{todas=d;aplicar()}).catch(err=>{
-  const e=$("#erro");e.hidden=false;
-  e.textContent=err.message+". Se abriu o arquivo direto do computador, publique no GitHub Pages ou rode um servidor local, pois o navegador bloqueia a leitura do CSV em file://.";
+/* ---------- Eventos e carga ---------- */
+$("q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render()});
+$("decade").addEventListener("change",e=>{state.decade=e.target.value;render()});
+$("country").addEventListener("change",e=>{state.country=e.target.value;render()});
+$("sort").addEventListener("change",e=>{state.sort=e.target.value;render()});
+$("clear").addEventListener("click",reset);
+$("toggle").addEventListener("click",()=>{
+  const open=$("filters").classList.toggle("open");
+  $("toggle").setAttribute("aria-expanded",open);
+  $("toggle").textContent=open?"Ocultar filtros":"Mostrar filtros";
 });
+$("csvfile").addEventListener("change",e=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{films=toFilms(String(r.result));buildFilters();reset();$("msg").textContent=`${films.length} revistas carregadas de ${file.name}.`}
+    catch(err){$("msg").textContent="Não foi possível ler o CSV: "+err.message}
+  };
+  r.onerror=()=>{$("msg").textContent="Não foi possível abrir o arquivo."};
+  r.readAsText(file,"utf-8");
+  e.target.value="";
+});
+
+function iniciar(texto,aviso){
+  films=toFilms(texto);buildFilters();render();
+  if(aviso)$("msg").textContent=aviso;
+}
+fetch("revistas.csv",{cache:"no-cache"})
+  .then(r=>{if(!r.ok)throw new Error("revistas.csv não encontrado");return r.text()})
+  .then(t=>iniciar(t,""))
+  .catch(()=>{
+    try{
+      iniciar($("csv-reserva").textContent,"Não foi possível ler revistas.csv; exibindo a cópia de reserva embutida. Publique no GitHub Pages ou use um servidor local para ler o arquivo.");
+    }catch(err){
+      buildFilters();render();
+      $("grid").innerHTML='<div class="empty"><strong>Catálogo indisponível.</strong><p>'+esc(err.message)+'</p></div>';
+    }
+  });
 </script>
 </body>
 </html>
