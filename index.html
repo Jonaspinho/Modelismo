@@ -36,10 +36,6 @@ label.chk .n{margin-left:auto;color:var(--muted);font-size:.8rem}
 input[type=search],select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
 button,.btn{font:600 .9rem var(--body);cursor:pointer;border-radius:8px;padding:9px 12px;border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;display:inline-block}
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.csvbox{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;font-size:.85rem;color:var(--muted)}
-.csvbox input{display:none}
-.csvbox label{margin-top:6px}
-#msg{margin:8px 0 0;font-size:.85rem}
 .toggle{display:none;width:100%;margin-bottom:12px}
 .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
@@ -111,12 +107,6 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
         </select>
       </fieldset>
       <button id="clear">Limpar filtros</button>
-      <div class="csvbox">
-        Os dados são lidos de um CSV hospedado no GitHub (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url, download_url).
-        <label class="btn" for="csvfile">Carregar outro CSV</label>
-        <input type="file" id="csvfile" accept=".csv,text/csv">
-        <p id="msg" role="status"></p>
-      </div>
     </aside>
   </div>
 
@@ -216,7 +206,7 @@ function reset(){
 }
 function render(){
   let list=films.map((f,i)=>({...f,i})).filter(f=>
-    (!state.genres.size||[...state.genres].every(g=>f.genres.includes(g)))&&
+    (!state.genres.size||[...state.genres].some(g=>f.genres.includes(g)))&&
     (!state.decade||Math.floor(f.year/10)*10==state.decade)&&
     (!state.country||f.country===state.country)&&
     (!state.q||f.title.toLowerCase().includes(state.q))
@@ -308,18 +298,6 @@ $("toggle").addEventListener("click",()=>{
   $("toggle").setAttribute("aria-expanded",open);
   $("toggle").textContent=open?"Ocultar filtros":"Mostrar filtros";
 });
-$("csvfile").addEventListener("change",e=>{
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{films=toFilms(String(r.result));buildFilters();reset();$("msg").textContent=`${films.length} revistas carregadas de ${file.name}.`}
-    catch(err){$("msg").textContent="Não foi possível ler o CSV: "+err.message}
-  };
-  r.onerror=()=>{$("msg").textContent="Não foi possível abrir o arquivo."};
-  r.readAsText(file,"utf-8");
-  e.target.value="";
-});
-
 /* Endereço do CSV. Troque pelo link do seu arquivo no GitHub, por exemplo:
    https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/main/revistas.csv
    Também é aceito o link normal (github.com/.../blob/...), que é convertido para raw.
@@ -335,11 +313,10 @@ function resolveCsvUrl(){
 const csvUrl=resolveCsvUrl();
 fetch(csvUrl,{cache:"no-cache"})
   .then(r=>{if(!r.ok)throw new Error("resposta "+r.status+" ao buscar o CSV");return r.text()})
-  .then(t=>{films=toFilms(t);buildFilters();render();$("msg").textContent=`${films.length} revistas lidas de ${csvUrl}`})
+  .then(t=>{films=toFilms(t);buildFilters();render()})
   .catch(err=>{
     buildFilters();render();
     const m="Não foi possível carregar o CSV ("+csvUrl+"): "+err.message+". Confira o endereço em CSV_URL e se o repositório é público.";
-    $("msg").textContent=m;
     $("grid").innerHTML='<div class="empty"><strong>Catálogo indisponível.</strong><p>'+esc(m)+'</p></div>';
   });
 </script>
