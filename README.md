@@ -21,6 +21,9 @@ Página estática com filtros (categoria, país, década), busca e leitor de PDF
 | `data_publicacao` | Data da edição, no formato `AAAA-MM-DD` |
 | `capa_url` | Link da capa, aberto em um iframe. Pode ficar vazio: a página gera uma capa de cor |
 | `pdf_url` | Link do PDF, aberto no leitor |
+| `download_url` | Link do botão **Baixar PDF** da tela de leitura. Se ficar vazio, o botão não aparece |
+
+Para o download forçar o salvamento com o nome da revista, o arquivo precisa estar no mesmo site da página (por exemplo, `pdfs/arquivo.pdf` no GitHub Pages). Em links de outros sites o navegador pode apenas abrir o PDF em uma nova aba, e aí o usuário salva pelo próprio navegador.
 
 Os links podem ser completos (`https://...`) ou caminhos do repositório (`pdfs/model-railroader-2026-10.pdf`, `capas/model-railroader.png`).
 Se um campo tiver vírgula, coloque o valor entre aspas duplas.

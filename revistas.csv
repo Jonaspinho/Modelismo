@@ -1,18 +1,18 @@
-titulo,ano,pais,sigla,categorias,data_publicacao,capa_url,pdf_url
-Model Railroader,1934,EUA,US,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Railway Modeller,1949,Reino Unido,UK,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-MIBA,1948,Alemanha,DE,Ferromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Engineer,2026,Reino Unido,UK,Vapor vivo;Ferromodelismo,2026-10-15,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Aeromodeller,1935,Reino Unido,UK,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Airplane News,1929,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Aviation,1975,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Boats,1950,Reino Unido,UK,Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Ships in Scale,1982,EUA,US,Nautimodelismo;Plastimodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-FineScale Modeler,1982,EUA,US,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Scale Aircraft Modelling,1978,Reino Unido,UK,Plastimodelismo;Aeromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Military Modelling,1971,Reino Unido,UK,Militar;Plastimodelismo,2026-08-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Model Art,1966,Japão,JP,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Hobby Japan,1969,Japão,JP,Plastimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Scale Auto,1978,EUA,US,Automodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-RC Car Action,1990,EUA,US,Automodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
-Modell Fan,1970,Alemanha,DE,Aeromodelismo;Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+titulo,ano,pais,sigla,categorias,data_publicacao,capa_url,pdf_url,download_url
+Model Railroader,1934,EUA,US,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Railway Modeller,1949,Reino Unido,UK,Ferromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+MIBA,1948,Alemanha,DE,Ferromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Engineer,1898,Reino Unido,UK,Vapor vivo;Ferromodelismo,2026-10-15,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Aeromodeller,1935,Reino Unido,UK,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Airplane News,1929,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Aviation,1975,EUA,US,Aeromodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Boats,1950,Reino Unido,UK,Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Ships in Scale,1982,EUA,US,Nautimodelismo;Plastimodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+FineScale Modeler,1982,EUA,US,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Scale Aircraft Modelling,1978,Reino Unido,UK,Plastimodelismo;Aeromodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Military Modelling,1971,Reino Unido,UK,Militar;Plastimodelismo,2026-08-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Model Art,1966,Japão,JP,Plastimodelismo;Militar,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Hobby Japan,1969,Japão,JP,Plastimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Scale Auto,1978,EUA,US,Automodelismo,2026-09-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+RC Car Action,1990,EUA,US,Automodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+Modell Fan,1970,Alemanha,DE,Aeromodelismo;Nautimodelismo,2026-10-01,,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf,https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf

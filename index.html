@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>O Porão</title>
+<title>Catálogo de revistas de modelismo</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -77,7 +77,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 </head>
 <body>
 <header>
-  <h1>O Porão</h1>
+  <h1>Revistas de modelismo</h1>
   <p>Filtre por categoria, país e década. Clique em uma revista para ler o PDF.</p>
 </header>
 
@@ -110,7 +110,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
       </fieldset>
       <button id="clear">Limpar filtros</button>
       <div class="csvbox">
-        Os dados são lidos de um CSV hospedado no GitHub (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url).
+        Os dados são lidos de um CSV hospedado no GitHub (colunas: titulo, ano, pais, sigla, categorias separadas por ;, data_publicacao em AAAA-MM-DD, capa_url, pdf_url, download_url).
         <label class="btn" for="csvfile">Carregar outro CSV</label>
         <input type="file" id="csvfile" accept=".csv,text/csv">
         <p id="msg" role="status"></p>
@@ -131,8 +131,9 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
   <div class="rbar">
     <strong id="rTitle"></strong>
     <span class="meta" id="rMeta"></span>
+    <a class="btn primary" id="rDownload" target="_blank" rel="noopener noreferrer" download>Baixar PDF</a>
     <a class="btn" id="rOpen" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-    <button class="primary" id="rClose">Fechar</button>
+    <button id="rClose">Fechar</button>
   </div>
   <iframe class="rframe" id="rFrame" title="Leitor de PDF"></iframe>
   <p class="rnote" id="rNote">Se o PDF não aparecer aqui, use “Abrir em nova aba”: alguns sites não permitem exibição dentro de outra página.</p>
@@ -179,7 +180,7 @@ function toFilms(text){
       title:o.titulo,year:parseInt(o.ano,10)||0,country:o.pais||"—",
       code:(o.sigla||o.pais||"").slice(0,3).toUpperCase(),
       genres:(o.categorias||"").split(";").map(s=>s.trim()).filter(Boolean),
-      pub:o.data_publicacao||"",cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),
+      pub:o.data_publicacao||"",cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),dl:safeUrl(o.download_url),
       c1:`hsl(${h} 60% 42%)`,c2:`hsl(${h} 65% 14%)`
     };
   });
@@ -249,6 +250,9 @@ function openReader(f,card){
   lastCard=card;
   $("rTitle").textContent=f.title;
   $("rMeta").textContent=`${f.country} · desde ${f.year||"—"} · publicação ${fmt(f.pub)}`;
+  const d=$("rDownload");
+  if(f.dl){d.href=f.dl;d.setAttribute("download",f.title.replace(/[^\w\-]+/g,"-").toLowerCase()+".pdf");d.hidden=false}
+  else{d.removeAttribute("href");d.hidden=true}
   const o=$("rOpen");
   if(f.pdf){o.href=f.pdf;o.hidden=false;$("rFrame").hidden=false;$("rFrame").src=f.pdf;$("rNote").textContent="Se o PDF não aparecer aqui, use “Abrir em nova aba”: alguns sites não permitem exibição dentro de outra página."}
   else{o.hidden=true;$("rFrame").hidden=true;$("rFrame").src="about:blank";$("rNote").textContent="Esta revista ainda não tem um link de PDF no CSV (coluna pdf_url)."}
