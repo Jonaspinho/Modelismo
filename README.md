@@ -19,7 +19,7 @@ Página estática com filtros (categoria, país, década), busca e leitor de PDF
 | `pais` | País por extenso |
 | `sigla` | Sigla do país (US, UK, DE, JP, BR...) |
 | `categorias` | Uma ou mais, separadas por `;` (ex.: `Aeromodelismo;Militar`) |
-| `data_publicacao` | Data da edição, no formato `AAAA-MM-DD` |
+| `data_publicacao` | Data da edição. Aceita `AAAA-MM-DD`, `AAAA-MM-DD HH:MM:SS` e `DD/MM/AAAA HH:MM`; a página mostra só a data |
 | `capa_url` | Link da capa, aberto em um iframe. Pode ficar vazio: a página gera uma capa de cor |
 | `pdf_url` | Link do PDF, aberto no leitor |
 | `download_url` | Link do botão **Baixar PDF** da tela de leitura. Se ficar vazio, o botão não aparece |

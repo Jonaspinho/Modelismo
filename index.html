@@ -177,7 +177,7 @@ function toFilms(text){
       title:o.titulo,series:serie,year:parseInt(o.ano,10)||0,country:o.pais||"—",
       code:(o.sigla||o.pais||"").slice(0,3).toUpperCase(),
       genres:(o.categorias||"").split(";").map(s=>s.trim()).filter(Boolean),
-      pub:o.data_publicacao||"",cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),dl:safeUrl(o.download_url),
+      pub:parseDate(o.data_publicacao),cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),dl:safeUrl(o.download_url),
       c1:`hsl(${h} 60% 42%)`,c2:`hsl(${h} 65% 14%)`
     };
   });
@@ -185,7 +185,19 @@ function toFilms(text){
 
 /* ---------- Interface ---------- */
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("pt-BR"):"—";
+/* Aceita data ou data com hora (AAAA-MM-DD, AAAA-MM-DD HH:MM:SS, AAAA-MM-DDTHH:MM,
+   DD/MM/AAAA, DD/MM/AAAA HH:MM...). Guarda só a data em AAAA-MM-DD; a hora é ignorada. */
+function parseDate(v){
+  v=(v||"").trim();if(!v)return "";
+  const p=n=>String(n).padStart(2,"0");
+  let m=v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+  if(m)return `${m[1]}-${p(m[2])}-${p(m[3])}`;
+  m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);
+  if(m)return `${m[3]}-${p(m[2])}-${p(m[1])}`;
+  const t=new Date(v);
+  return isNaN(t)?"":`${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`;
+}
+const fmt=d=>d?d.split("-").reverse().join("/"):"—";
 
 function buildFilters(){
   const checks=(box,legend,set,values,countOf)=>{
@@ -245,12 +257,12 @@ const cardHtml=f=>`
       <div class="poster${f.cover?" hascover":""}" style="--c1:${f.c1};--c2:${f.c2}">
         ${f.cover?`<iframe src="${esc(f.cover)}" title="" tabindex="-1" scrolling="no" loading="lazy"></iframe>`:""}
         <span class="score">${esc(f.code)}</span>
-        <div class="t"><b>${esc(f.title)}</b><span>desde ${f.year||"—"}</span></div>
+        <div class="t"><b>${esc(f.title)}</b><span>${f.year||"—"}</span></div>
       </div>
       <div class="info">
         <h3>${esc(f.title)}</h3>
         <p>${esc(f.genres.join(", "))}</p>
-        <p>${esc(f.country)} · desde ${f.year||"—"}</p>
+        <p>${esc(f.country)} · ${f.year||"—"}</p>
         <p>Publicação: ${fmt(f.pub)}</p>
       </div>
     </button>`;
@@ -275,7 +287,7 @@ let lastCard=null;
 function openReader(f,card){
   lastCard=card;
   $("rTitle").textContent=f.title;
-  $("rMeta").textContent=`${f.country} · desde ${f.year||"—"} · publicação ${fmt(f.pub)}`;
+  $("rMeta").textContent=`${f.country} · ${f.year||"—"} · publicação ${fmt(f.pub)}`;
   const d=$("rDownload");
   if(f.dl){d.href=f.dl;d.setAttribute("download",f.title.replace(/[^\w\-]+/g,"-").toLowerCase()+".pdf");d.hidden=false}
   else{d.removeAttribute("href");d.hidden=true}
