@@ -56,6 +56,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 .info p{margin:2px 0 0;color:var(--muted)}
 #sentinel{height:1px}
 #more{text-align:center;color:var(--muted);font-size:.85rem;margin:20px 0 0}
+#series{max-height:230px;overflow-y:auto}
 .empty{grid-column:1/-1;padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
 .reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader[hidden]{display:none}
@@ -88,6 +89,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
         <legend>Buscar</legend>
         <input type="search" id="q" placeholder="Título da revista" aria-label="Buscar por título">
       </fieldset>
+      <fieldset id="series"><legend>Revista</legend></fieldset>
       <fieldset id="genres"><legend>Categoria</legend></fieldset>
       <fieldset>
         <legend>País</legend>
@@ -136,7 +138,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 <script>
 const $=id=>document.getElementById(id);
 let films=[];
-const state={genres:new Set(),decade:"",country:"",q:"",sort:"pub"};
+const state={series:new Set(),genres:new Set(),decade:"",country:"",q:"",sort:"pub"};
 
 /* ---------- CSV ---------- */
 function parseCSV(text){
@@ -169,9 +171,10 @@ function toFilms(text){
   if(!head.includes("titulo"))throw new Error("O CSV precisa ter a coluna “titulo”.");
   return rows.slice(1).map(r=>{
     const o={};head.forEach((h,i)=>o[h]=(r[i]||"").trim());
-    const h=hue(o.titulo);
+    const serie=(o.revista||o.titulo.replace(/\s*#\s*\d+\s*$|\s+(?:n[º°o]\.?\s*)?\d+\s*$/i,"")).trim()||o.titulo;
+    const h=hue(serie);
     return{
-      title:o.titulo,year:parseInt(o.ano,10)||0,country:o.pais||"—",
+      title:o.titulo,series:serie,year:parseInt(o.ano,10)||0,country:o.pais||"—",
       code:(o.sigla||o.pais||"").slice(0,3).toUpperCase(),
       genres:(o.categorias||"").split(";").map(s=>s.trim()).filter(Boolean),
       pub:o.data_publicacao||"",cover:safeUrl(o.capa_url),pdf:safeUrl(o.pdf_url),dl:safeUrl(o.download_url),
@@ -185,27 +188,31 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;","
 const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("pt-BR"):"—";
 
 function buildFilters(){
-  const g=$("genres");g.innerHTML="<legend>Categoria</legend>";
-  const gens=[...new Set(films.flatMap(f=>f.genres))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
-  gens.forEach(name=>{
-    const n=films.filter(f=>f.genres.includes(name)).length;
-    const l=document.createElement("label");l.className="chk";
-    l.innerHTML=`<input type="checkbox" value="${esc(name)}"><span>${esc(name)}</span><span class="n">${n}</span>`;
-    l.querySelector("input").addEventListener("change",e=>{e.target.checked?state.genres.add(name):state.genres.delete(name);render()});
-    g.appendChild(l);
-  });
+  const checks=(box,legend,set,values,countOf)=>{
+    box.innerHTML=`<legend>${legend}</legend>`;
+    values.forEach(name=>{
+      const l=document.createElement("label");l.className="chk";
+      l.innerHTML=`<input type="checkbox" value="${esc(name)}"><span>${esc(name)}</span><span class="n">${countOf(name)}</span>`;
+      l.querySelector("input").addEventListener("change",e=>{e.target.checked?set.add(name):set.delete(name);render()});
+      box.appendChild(l);
+    });
+  };
+  const sort=a=>[...new Set(a)].sort((x,y)=>x.localeCompare(y,"pt-BR"));
+  checks($("series"),"Revista",state.series,sort(films.map(f=>f.series)),n=>films.filter(f=>f.series===n).length);
+  checks($("genres"),"Categoria",state.genres,sort(films.flatMap(f=>f.genres)),n=>films.filter(f=>f.genres.includes(n)).length);
   const opt=(sel,items,all)=>{sel.innerHTML=`<option value="">${all}</option>`+items.map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join("")};
   opt($("country"),[...new Set(films.map(f=>f.country))].sort((a,b)=>a.localeCompare(b,"pt-BR")).map(c=>[c,c]),"Todos");
   opt($("decade"),[...new Set(films.filter(f=>f.year).map(f=>Math.floor(f.year/10)*10))].sort((a,b)=>b-a).map(d=>[d,`Anos ${d}`]),"Todas");
 }
 function reset(){
-  state.genres.clear();state.decade="";state.country="";state.q="";state.sort="pub";
-  document.querySelectorAll("#genres input").forEach(i=>i.checked=false);
+  state.series.clear();state.genres.clear();state.decade="";state.country="";state.q="";state.sort="pub";
+  document.querySelectorAll("#series input,#genres input").forEach(i=>i.checked=false);
   $("decade").value="";$("country").value="";$("q").value="";$("sort").value="pub";
   render();
 }
 function render(){
   let list=films.map((f,i)=>({...f,i})).filter(f=>
+    (!state.series.size||state.series.has(f.series))&&
     (!state.genres.size||[...state.genres].some(g=>f.genres.includes(g)))&&
     (!state.decade||Math.floor(f.year/10)*10==state.decade)&&
     (!state.country||f.country===state.country)&&
@@ -217,6 +224,7 @@ function render(){
 
   const chips=$("chips");chips.innerHTML="";
   const add=(label,fn)=>{const b=document.createElement("button");b.className="chip";b.textContent=label+" ×";b.setAttribute("aria-label","Remover filtro "+label);b.onclick=fn;chips.appendChild(b)};
+  state.series.forEach(n=>add(n,()=>{state.series.delete(n);document.querySelectorAll("#series input").forEach(i=>{if(i.value===n)i.checked=false});render()}));
   state.genres.forEach(g=>add(g,()=>{state.genres.delete(g);document.querySelectorAll("#genres input").forEach(i=>{if(i.value===g)i.checked=false});render()}));
   if(state.decade)add(`Anos ${state.decade}`,()=>{state.decade="";$("decade").value="";render()});
   if(state.country)add(state.country,()=>{state.country="";$("country").value="";render()});

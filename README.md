@@ -13,7 +13,8 @@ Página estática com filtros (categoria, país, década), busca e leitor de PDF
 
 | Coluna | Conteúdo |
 | --- | --- |
-| `titulo` | Título da revista (obrigatório) |
+| `titulo` | Título da edição, como aparece no card (ex.: `SBF Magazine #01`). Obrigatório |
+| `revista` | Nome que agrupa as edições (ex.: `SBF Magazine`). Gera o filtro **Revista**. Se ficar vazio, a página usa o título sem o número final (`#01`, `nº 2`...) |
 | `ano` | Ano de início |
 | `pais` | País por extenso |
 | `sigla` | Sigla do país (US, UK, DE, JP, BR...) |
@@ -58,7 +59,7 @@ const CSV_URL="https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/mai
 
 ## Observações
 
+- Na lista de categorias, marcar mais de uma mostra as revistas que têm qualquer uma delas (ex.: Aeromodelismo + Ferromodelismo mostra as duas categorias). Os filtros de país, década e busca continuam restringindo o resultado.
 - O catálogo carrega conforme a rolagem: 12 revistas por vez, e mais 12 a cada vez que o fim da lista se aproxima. O tamanho do bloco está na constante `PAGE`, no `index.html`.
 - PDFs hospedados no próprio repositório abrem no leitor sem problemas. Links de outros sites só abrem se o site permitir exibição em iframe; o botão **Abrir em nova aba** serve de alternativa.
 - GitHub limita arquivos comuns a 100 MB.
-- O botão **Carregar outro CSV** testa um arquivo local sem alterá-lo no repositório.
