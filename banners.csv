@@ -1,0 +1,4 @@
+titulo,imagem_url,link_url,data_inicio,data_validade
+Banner de exemplo 1,https://placehold.co/728x90/2b4bff/ffffff?text=Seu+anuncio+aqui+728x90,https://example.com,2026-01-01,2027-12-31
+Banner de exemplo 2,https://placehold.co/728x90/0ca678/ffffff?text=Segundo+banner,https://example.com,,2027-12-31 23:59:00
+Banner vencido (nao aparece),https://placehold.co/728x90/e03131/ffffff?text=Vencido,https://example.com,,2026-01-01

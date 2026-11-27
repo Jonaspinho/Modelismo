@@ -69,6 +69,12 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 .scroll::-webkit-scrollbar-track,aside::-webkit-scrollbar-track{background:transparent}
 .scroll::-webkit-scrollbar-thumb,aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;border:2px solid transparent;background-clip:content-box}
 .scroll::-webkit-scrollbar-thumb:hover,aside::-webkit-scrollbar-thumb:hover{background:var(--muted);background-clip:content-box}
+.banner-wrap{display:flex;justify-content:center;padding:12px clamp(16px,4vw,48px) 0}
+.banner-wrap[hidden]{display:none}
+.banner{position:relative;width:100%;max-width:728px;aspect-ratio:728/90;overflow:hidden;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
+.banner iframe{position:absolute;top:0;left:0;width:728px;height:90px;border:0;transform-origin:0 0;background:#fff}
+.banner a{position:absolute;inset:0;z-index:1}
+.banner a:not([href]){display:none}
 .empty{grid-column:1/-1;padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
 .reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader[hidden]{display:none}
@@ -89,6 +95,12 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
      crossorigin="anonymous"></script>
 </head>
 <body>
+<div class="banner-wrap" id="banner" hidden>
+  <div class="banner" id="bannerBox" role="complementary" aria-label="Publicidade">
+    <iframe id="bannerFrame" title="Banner" sandbox="allow-scripts" referrerpolicy="no-referrer" scrolling="no" width="728" height="90"></iframe>
+    <a id="bannerLink" target="_blank" rel="noopener noreferrer sponsored" aria-label="Abrir anúncio"></a>
+  </div>
+</div>
 <header>
   <h1>O Porão</h1>
   <p>Filtre por categoria, país e década. Clique em uma revista para ler o PDF.</p>
@@ -361,6 +373,63 @@ fetch(csvUrl,{cache:"no-cache"})
     const m="Não foi possível carregar o CSV ("+csvUrl+"): "+err.message+". Confira o endereço em CSV_URL e se o repositório é público.";
     $("grid").innerHTML='<div class="empty"><strong>Catálogo indisponível.</strong><p>'+esc(m)+'</p></div>';
   });
+
+/* ---------- Banner 728x90 (lido de um CSV) ---------- */
+/* Endereço do CSV de banners. Colunas: titulo, imagem_url, link_url, data_inicio (opcional), data_validade.
+   Troque pelo link raw do seu arquivo no GitHub, ou use ?banners=ENDERECO na URL da página. */
+const BANNERS_URL="banners.csv";
+const BANNER_MS=10000;
+let banners=[],bIdx=0,bShown="";
+
+function ghRaw(u){
+  const m=u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);
+  return m?`https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`:u;
+}
+function nowKey(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+const hasTime=v=>/[T\s]\d{1,2}:\d{2}/.test(v||"");
+/* Validade: só data = vale até o fim desse dia; data com hora = vale até essa hora. Vazio = sem prazo. */
+function bannerValid(b){
+  const now=nowKey();
+  if(b.inicio&&now<parseKey(b.inicio))return false;
+  if(!b.validade)return true;
+  const k=parseKey(b.validade);
+  if(!k)return false;
+  return hasTime(b.validade)?now<=k:now.slice(0,10)<=k.slice(0,10);
+}
+function fitBanner(){
+  const w=$("bannerBox").clientWidth;
+  $("bannerFrame").style.transform=`scale(${w/728})`;
+}
+function showBanner(){
+  const ok=banners.filter(bannerValid);
+  if(!ok.length){$("banner").hidden=true;$("bannerFrame").src="about:blank";bShown="";return}
+  const b=ok[bIdx%ok.length];bIdx++;
+  $("banner").hidden=false;
+  if(b.img!==bShown){$("bannerFrame").src=b.img;bShown=b.img}
+  $("bannerFrame").title=b.titulo||"Banner";
+  const a=$("bannerLink");
+  if(b.link){a.href=b.link;a.setAttribute("aria-label",b.titulo||"Abrir anúncio")}else a.removeAttribute("href");
+  fitBanner();
+}
+function startBanners(text){
+  const rows=parseCSV(text);if(rows.length<2)return;
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  banners=rows.slice(1).map(r=>{
+    const o={};head.forEach((h,i)=>o[h]=(r[i]||"").trim());
+    const link=(o.link_url||"");
+    return{titulo:o.titulo,img:safeUrl(o.imagem_url),link:/^https?:\/\//i.test(link)?link:"",inicio:o.data_inicio,validade:o.data_validade};
+  }).filter(b=>b.img);
+  showBanner();
+  if(banners.length>1)setInterval(()=>{if(!document.hidden)showBanner()},BANNER_MS);
+}
+if("ResizeObserver" in window)new ResizeObserver(fitBanner).observe($("bannerBox"));else addEventListener("resize",fitBanner);
+fetch(ghRaw(new URLSearchParams(location.search).get("banners")||BANNERS_URL),{cache:"no-cache"})
+  .then(r=>{if(!r.ok)throw 0;return r.text()})
+  .then(startBanners)
+  .catch(()=>{});
 </script>
 </body>
 </html>

@@ -57,6 +57,22 @@ const CSV_URL="https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/mai
 - Depois de editar o CSV no GitHub (botão de lápis, ou novo commit), basta recarregar a página. O endereço raw pode demorar alguns minutos para refletir a mudança por causa do cache do GitHub.
 - Links relativos de `pdf_url` e `capa_url` (como `pdfs/arquivo.pdf`) são resolvidos a partir do endereço da página, então funcionam quando os PDFs estão no mesmo site do GitHub Pages. Se a página estiver em outro lugar, use links completos.
 
+## Banner 728x90
+
+O topo da página tem um banner que lê o arquivo `banners.csv` (endereço na constante `BANNERS_URL` do `index.html`; também aceita `?banners=ENDERECO` na URL).
+
+| Coluna | Conteúdo |
+| --- | --- |
+| `titulo` | Nome do banner (texto alternativo) |
+| `imagem_url` | Link da imagem (ou página HTML 728x90), aberto em um iframe |
+| `link_url` | Para onde o clique leva (opcional; só `https://`) |
+| `data_inicio` | Quando começa a aparecer (opcional) |
+| `data_validade` | Quando deixa de aparecer. Só data = vale até o fim desse dia; com hora (`2027-12-31 18:00`) = vale até essa hora. Vazio = sem prazo |
+
+- Só os banners dentro da validade aparecem. Com mais de um válido, eles se alternam a cada 10 segundos (`BANNER_MS`). Sem nenhum válido, o banner some.
+- No celular o banner de 728x90 é reduzido proporcionalmente para caber na largura da tela.
+- O iframe roda com `sandbox="allow-scripts"`. Se o site da imagem bloquear exibição em iframe, o espaço fica em branco.
+
 ## Observações
 
 - Na lista de categorias, marcar mais de uma mostra as revistas que têm qualquer uma delas (ex.: Aeromodelismo + Ferromodelismo mostra as duas categorias). Os filtros de país, década e busca continuam restringindo o resultado.
