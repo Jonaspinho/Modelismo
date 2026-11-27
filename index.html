@@ -73,8 +73,6 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 .banner-wrap[hidden]{display:none}
 .banner{position:relative;width:100%;max-width:728px;aspect-ratio:728/90;overflow:hidden;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
 .banner iframe{position:absolute;top:0;left:0;width:728px;height:90px;border:0;transform-origin:0 0;background:#fff}
-.banner a{position:absolute;inset:0;z-index:1}
-.banner a:not([href]){display:none}
 .empty{grid-column:1/-1;padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
 .reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader[hidden]{display:none}
@@ -135,8 +133,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
   <main>
   <div class="banner-wrap" id="banner" hidden>
     <div class="banner" id="bannerBox" role="complementary" aria-label="Publicidade">
-      <iframe id="bannerFrame" title="Banner" sandbox="allow-scripts" referrerpolicy="no-referrer" scrolling="no" width="728" height="90"></iframe>
-      <a id="bannerLink" target="_blank" rel="noopener noreferrer sponsored" aria-label="Abrir anúncio"></a>
+      <iframe id="bannerFrame" title="Banner" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation" referrerpolicy="no-referrer" scrolling="no" width="728" height="90"></iframe>
     </div>
   </div>
     <div class="bar">
@@ -375,7 +372,8 @@ fetch(csvUrl,{cache:"no-cache"})
   });
 
 /* ---------- Banner 728x90 (lido de um CSV) ---------- */
-/* Endereço do CSV de banners. Colunas: titulo, imagem_url, link_url, data_inicio (opcional), data_validade.
+/* Endereço do CSV de banners. Colunas: titulo, iframe_url, data_inicio (opcional), data_validade.
+   A imagem e o link do banner ficam dentro da página/iframe indicada em iframe_url (o clique acontece dentro do iframe).
    Troque pelo link raw do seu arquivo no GitHub, ou use ?banners=ENDERECO na URL da página. */
 const BANNERS_URL="banners.csv";
 const BANNER_MS=10000;
@@ -410,17 +408,19 @@ function showBanner(){
   $("banner").hidden=false;
   if(b.img!==bShown){$("bannerFrame").src=b.img;bShown=b.img}
   $("bannerFrame").title=b.titulo||"Banner";
-  const a=$("bannerLink");
-  if(b.link){a.href=b.link;a.setAttribute("aria-label",b.titulo||"Abrir anúncio")}else a.removeAttribute("href");
   fitBanner();
+}
+/* A célula pode ter só o endereço ou o código <iframe src="...">; usa-se apenas o src. */
+function bannerSrc(v){
+  const m=(v||"").match(/<iframe[^>]*?\ssrc\s*=\s*["']([^"']+)["']/i);
+  return safeUrl(m?m[1]:v);
 }
 function startBanners(text){
   const rows=parseCSV(text);if(rows.length<2)return;
   const head=rows[0].map(h=>h.trim().toLowerCase());
   banners=rows.slice(1).map(r=>{
     const o={};head.forEach((h,i)=>o[h]=(r[i]||"").trim());
-    const link=(o.link_url||"");
-    return{titulo:o.titulo,img:safeUrl(o.imagem_url),link:/^https?:\/\//i.test(link)?link:"",inicio:o.data_inicio,validade:o.data_validade};
+    return{titulo:o.titulo,img:bannerSrc(o.iframe_url||o.imagem_url||""),inicio:o.data_inicio,validade:o.data_validade};
   }).filter(b=>b.img);
   showBanner();
   if(banners.length>1)setInterval(()=>{if(!document.hidden)showBanner()},BANNER_MS);

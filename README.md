@@ -59,19 +59,19 @@ const CSV_URL="https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/mai
 
 ## Banner 728x90
 
-O topo da página tem um banner que lê o arquivo `banners.csv` (endereço na constante `BANNERS_URL` do `index.html`; também aceita `?banners=ENDERECO` na URL).
+O banner fica acima da lista de revistas e lê o arquivo `banners.csv` (endereço na constante `BANNERS_URL` do `index.html`; também aceita `?banners=ENDERECO` na URL).
 
 | Coluna | Conteúdo |
 | --- | --- |
-| `titulo` | Nome do banner (texto alternativo) |
-| `imagem_url` | Link da imagem (ou página HTML 728x90), aberto em um iframe |
-| `link_url` | Para onde o clique leva (opcional; só `https://`) |
+| `titulo` | Nome do banner |
+| `iframe_url` | Página do banner, aberta em um iframe. Pode ser o endereço (`banners/exemplo-1.html`, `https://...`) ou o código `<iframe src="...">` (a página usa só o `src`) |
 | `data_inicio` | Quando começa a aparecer (opcional) |
 | `data_validade` | Quando deixa de aparecer. Só data = vale até o fim desse dia; com hora (`2027-12-31 18:00`) = vale até essa hora. Vazio = sem prazo |
 
+- A imagem e o link do banner ficam **dentro** da página do iframe: o clique acontece nela. Veja `banners/exemplo-1.html` (uma imagem 728x90 dentro de um link).
 - Só os banners dentro da validade aparecem. Com mais de um válido, eles se alternam a cada 10 segundos (`BANNER_MS`). Sem nenhum válido, o banner some.
 - No celular o banner de 728x90 é reduzido proporcionalmente para caber na largura da tela.
-- O iframe roda com `sandbox="allow-scripts"`. Se o site da imagem bloquear exibição em iframe, o espaço fica em branco.
+- O iframe roda com `sandbox` (scripts, pop-ups e navegação por clique permitidos). Se o site do banner bloquear exibição em iframe, o espaço fica em branco.
 
 ## Observações
 
