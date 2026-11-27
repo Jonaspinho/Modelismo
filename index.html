@@ -69,7 +69,7 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
 .scroll::-webkit-scrollbar-track,aside::-webkit-scrollbar-track{background:transparent}
 .scroll::-webkit-scrollbar-thumb,aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;border:2px solid transparent;background-clip:content-box}
 .scroll::-webkit-scrollbar-thumb:hover,aside::-webkit-scrollbar-thumb:hover{background:var(--muted);background-clip:content-box}
-.banner-wrap{display:flex;justify-content:center;padding:12px clamp(16px,4vw,48px) 0}
+.banner-wrap{display:flex;justify-content:center;margin:0 0 18px}
 .banner-wrap[hidden]{display:none}
 .banner{position:relative;width:100%;max-width:728px;aspect-ratio:728/90;overflow:hidden;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
 .banner iframe{position:absolute;top:0;left:0;width:728px;height:90px;border:0;transform-origin:0 0;background:#fff}
@@ -95,12 +95,6 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
      crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="banner-wrap" id="banner" hidden>
-  <div class="banner" id="bannerBox" role="complementary" aria-label="Publicidade">
-    <iframe id="bannerFrame" title="Banner" sandbox="allow-scripts" referrerpolicy="no-referrer" scrolling="no" width="728" height="90"></iframe>
-    <a id="bannerLink" target="_blank" rel="noopener noreferrer sponsored" aria-label="Abrir anúncio"></a>
-  </div>
-</div>
 <header>
   <h1>O Porão</h1>
   <p>Filtre por categoria, país e década. Clique em uma revista para ler o PDF.</p>
@@ -139,6 +133,12 @@ button.primary{background:var(--accent);color:var(--accent-ink);border-color:var
   </div>
 
   <main>
+  <div class="banner-wrap" id="banner" hidden>
+    <div class="banner" id="bannerBox" role="complementary" aria-label="Publicidade">
+      <iframe id="bannerFrame" title="Banner" sandbox="allow-scripts" referrerpolicy="no-referrer" scrolling="no" width="728" height="90"></iframe>
+      <a id="bannerLink" target="_blank" rel="noopener noreferrer sponsored" aria-label="Abrir anúncio"></a>
+    </div>
+  </div>
     <div class="bar">
       <span id="count" aria-live="polite"></span>
       <div class="chips" id="chips"></div>
